@@ -13,21 +13,22 @@ type
   TMATRIX = array [1 .. 10, 1 .. 10] of string;
   TMASSTR = array [1 .. 40] of string;
   Str = Array [1 .. 10] of string;
-  Pole = Array [1 .. 10, 1 .. 10] of string;
 
 var
   field1, field2: TMATRIX;
-  field1_with_boats: TMATRIX = (('М', 'М', 'М', 'М', 'К', 'К', 'К', 'К', 'М', 'М'),
-    ('М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'К', 'М'),
+  field1_with_boats: TMATRIX = (
+    ('М', 'М', 'М', 'М', 'К', 'К', 'К', 'К', 'М', 'М'),
+    ('М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'К'),
     ('М', 'К', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М'),
     ('М', 'К', 'М', 'М', 'М', 'М', 'М', 'К', 'К', 'М'),
     ('М', 'К', 'М', 'К', 'К', 'К', 'М', 'М', 'М', 'М'),
     ('М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М'),
     ('М', 'К', 'М', 'М', 'М', 'К', 'М', 'К', 'К', 'М'),
-    ('М', 'М', 'М', 'М', 'М', 'К', 'М', 'М', 'М', 'К'),
+    ('М', 'М', 'М', 'М', 'М', 'К', 'М', 'М', 'М', 'М'),
     ('М', 'М', 'К', 'М', 'М', 'М', 'М', 'М', 'М', 'М'),
-    ('М', 'М', 'М', 'М', 'М', 'М', 'М', 'К', 'М', 'М'));
-  field2_with_boats: TMATRIX = (('К', 'К', 'М', 'К', 'М', 'М', 'М', 'М', 'М', 'М'),
+    ('М', 'М', 'М', 'М', 'М', 'М', 'М', 'К', 'М', 'К'));
+  field2_with_boats: TMATRIX = (
+    ('К', 'К', 'М', 'К', 'М', 'М', 'М', 'М', 'М', 'М'),
     ('М', 'М', 'М', 'М', 'М', 'М', 'М', 'К', 'М', 'М'),
     ('К', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М'),
     ('К', 'М', 'К', 'К', 'К', 'К', 'М', 'М', 'М', 'М'),
@@ -35,7 +36,7 @@ var
     ('К', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М'),
     ('К', 'М', 'М', 'К', 'М', 'К', 'К', 'К', 'М', 'М'),
     ('М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М', 'М'),
-    ('К', 'К', 'К', 'М', 'К', 'М', 'М', 'М', 'М', 'М'),
+    ('К', 'К', 'М', 'М', 'К', 'М', 'М', 'М', 'М', 'М'),
     ('М', 'М', 'М', 'М', 'М', 'М', 'К', 'М', 'М', 'М'));
 
   lettersро: TMASSTR;
@@ -47,13 +48,13 @@ var
   inputfile: textfile;
 
 
-function IfFileValid(FileName: string): Pole;
+function IfFileValid(FileName: string): TMATRIX;
 var
   f: textfile;
   FileData: Str;
   i, j: integer;
   TempMat: array [1 .. 10, 1 .. 10] of char;
-  Pol: Pole;
+  Pol: TMATRIX;
 
 begin
 
@@ -343,10 +344,164 @@ begin
   end;
 end;
 
+function ships_valid(var MAS: TMATRIX): boolean;
+var
+i,j,rep_num,m,k,ship_deck1,ship_deck2,ship_deck3,ship_deck4:integer;
+buf: char;
+diagonal_flag: boolean;
+begin
+ships_valid:=false;rep_num:=0;ship_deck1:=0;ship_deck2:=0;ship_deck3:=0;ship_deck4:=0;
+  for i:= 1 to 10 do
+  begin
+  rep_num:=0;
+    for j:= 1 to 10 do
+    begin
+      buf:=MAS[i,j][1];
+      if (MAS[i,j]='К') or (MAS[i,j]='к') then
+      begin
+      rep_num:=rep_num+1;
+      if j=10 then
+      begin
+        case rep_num of
+        1:ship_deck1:=ship_deck1+1;
+        2:ship_deck2:=ship_deck2+1;
+        3:ship_deck3:=ship_deck3+1;
+        4:ship_deck4:=ship_deck4+1;
+        end;
+        rep_num:=0;
+      end;
+      end
+      else
+      begin
+        case rep_num of
+        1:ship_deck1:=ship_deck1+1;
+        2:ship_deck2:=ship_deck2+1;
+        3:ship_deck3:=ship_deck3+1;
+        4:ship_deck4:=ship_deck4+1;
+        end;
+        rep_num:=0;
+      end;
+    end;
+  end;
+
+    rep_num:=0;
+  for j:= 1 to 10 do
+  begin
+  rep_num:=0;
+    for i:= 1 to 10 do
+    begin
+      buf:=MAS[i,j][1];
+      if (MAS[i,j]='К') or (MAS[i,j]='к') then
+      begin
+      rep_num:=rep_num+1;
+      if i=10 then
+      begin
+        case rep_num of
+        1:ship_deck1:=ship_deck1+1;
+        2:ship_deck2:=ship_deck2+1;
+        3:ship_deck3:=ship_deck3+1;
+        4:ship_deck4:=ship_deck4+1;
+        end;
+        rep_num:=0;
+      end;
+      end
+      else
+      begin
+        case rep_num of
+        1:ship_deck1:=ship_deck1+1;
+        2:ship_deck2:=ship_deck2+1;
+        3:ship_deck3:=ship_deck3+1;
+        4:ship_deck4:=ship_deck4+1;
+        end;
+        rep_num:=0;
+      end;
+    end;
+  end;
+
+  j:=1;
+  for i:=2 to 10 do
+    begin
+      rep_num:=0;
+      k:=j;
+      m:=i;
+      repeat
+      if (MAS[m,k]='К') or (MAS[m,k]='к') then
+      begin
+        rep_num:=rep_num+1;
+        if rep_num>1 then diagonal_flag:=false;
+      end
+      else rep_num:=0;
+      m:=m-1;
+      k:=k+1;
+      until k>i;
+    end;
+
+  i:=10;
+  for j:=2 to 9 do
+    begin
+      rep_num:=0;
+      k:=j;
+      m:=i;
+      repeat
+      if (MAS[m,k]='К') or (MAS[m,k]='к') then
+      begin
+        rep_num:=rep_num+1;
+        if rep_num>1 then diagonal_flag:=false;
+      end
+      else rep_num:=0;
+      m:=m-1;
+      k:=k+1;
+      until m<j;
+    end;
+
+   i:=10;
+    for j:=2 to 9 do
+    begin
+      rep_num:=0;
+      k:=j;
+      m:=i;
+      repeat
+      if (MAS[m,k]='К') or (MAS[m,k]='к') then
+      begin
+        rep_num:=rep_num+1;
+        if rep_num>1 then diagonal_flag:=false;
+      end
+      else rep_num:=0;
+      m:=m-1;
+      k:=k-1;
+      until k<1;
+    end;
+
+    i:=1;
+    for j:=1 to 9 do
+    begin
+      rep_num:=0;
+      k:=j;
+      m:=i;
+      repeat
+      if (MAS[m,k]='К') or (MAS[m,k]='к') then
+      begin
+        rep_num:=rep_num+1;
+        if rep_num>1 then diagonal_flag:=false;
+      end
+      else rep_num:=0;
+      m:=m+1;
+      k:=k+1;
+      until k>10;
+    end;
+
+
+
+  if (ship_deck1=24)and(ship_deck2=3)and(ship_deck3=2)and(ship_deck4=1)and diagonal_flag then
+  ships_valid:=true;
+end;
 
 begin
 
   help_table(lettersро);
+
+  if (ships_valid(field1_with_boats) and ships_valid(field2_with_boats)) then
+
 
   writeln('Краткое описание : ');
   writeln('Игра - Морской Бой');
