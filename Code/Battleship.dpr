@@ -13,7 +13,6 @@ type
   TMATRIX = array [1 .. 10, 1 .. 10] of string;
   TMASSTR = array [1 .. 40] of string;
   Str = Array [1 .. 10] of string;
-  Pole = Array [1 .. 10, 1 .. 10] of string;
   coord = array [1 .. 4] of integer;
   TMASCOORD = array [1 .. 4] of string;
   boat = array [1..22] of string;
@@ -33,15 +32,17 @@ var
   coordin: coord;
   pos_coordin: TMASCOORD;
 
-function Player1Fill(Player1: string): TMATRIX;
+function IfFileValid(FileName: string): TMatrix;
 var
   f: textfile;
   FileData: Str;
   i, j, k: integer;
+  Flag: boolean;
   TempMat: array [1 .. 10, 1 .. 10] of Ansichar;
-  Pol: TMATRIX;
+  Pol: Tmatrix;
 begin
-  AssignFile(f, 'Player1.txt', CP_UTF8);
+  Flag:=True;
+  AssignFile(f, FileName +'.TXT', CP_UTF8);
   Reset(f);
   i := 1;
   while (not EOF(f)) do
@@ -61,11 +62,21 @@ begin
       k:=k+1;
     end;
   end;
-
-  for var l := 1 to 10 do
-  begin
-    for var g := 1 to Length(FileData[l]) do
+  for var t:= 1 to Length(FileData) do
     begin
+      for var h := 1 to Length(FileData[t]) do
+        begin
+          FileData[t][h]:=(UpperCase(FileData[t][h])[1]);
+        end;
+    end;
+  if Length(FileData)=10 then
+  begin
+  for var l := 1 to 10 do
+   begin
+    if Length(FileData[l])=Length(Pol[l]) then
+    begin
+    for var g := 1 to Length(FileData[l]) do
+     begin
       case FileData[l][g] of
         'М':
         begin
@@ -79,64 +90,29 @@ begin
         begin
           Writeln('Некорректно введенный файл!');
           readln;
+          Flag:=false;
           break;
         end;
       end;
+     end;
+    end
+    else
+    begin
+      Writeln('Некорректно введенный файл!');
+      readln;
+      Flag:=false;
+      break;
     end;
+   end;
+  end
+  else
+  begin
+    Writeln('Некорректно введенный файл!');
+    readln;
+    Flag:=false;
   end;
-  result := Pol
-end;
 
-function Player2Fill(Player2: string): TMATRIX;
-var
-  f: textfile;
-  FileData: Str;
-  i, j, k: integer;
-  TempMat: array [1 .. 10, 1 .. 10] of Ansichar;
-  Pol: TMATRIX;
-begin
-  AssignFile(f, 'Player2.txt', CP_UTF8);
-  Reset(f);
-  i := 1;
-  while (not EOF(f)) do
-  begin
-    Readln(f, FileData[i]);
-    i := i + 1;
-  end;
-  for var h := 1 to Length(FileData) do
-  begin
-    k:=1;
-    while k<=Length(FileData[h]) do
-    begin
-      if FileData[h][k]=' ' then
-      begin
-      delete(FileData[h], k, 1);
-      end;
-      k:=k+1;
-    end;
-  end;
-  for var l := 1 to 10 do
-  begin
-    for var g := 1 to Length(FileData[l]) do
-    begin
-      case FileData[l][g] of
-        'М':
-        begin
-          Pol[l][g]:='М';
-        end;
-        'К':
-        begin
-          Pol[l][g]:='К';
-        end;
-        else
-        begin
-          Writeln('Некорректно введенный файл!');
-          readln;
-          break;
-        end;
-      end;
-    end;
-  end;
+  if Flag then
   result := Pol
 end;
 
@@ -1075,9 +1051,9 @@ end;
 begin
 
   help_table(lettersро);
-  field1_with_boats := Player1Fill('Player1');
-  field2_with_boats :=  Player2Fill('Player2');
-  ClearScreen;
+  field1_with_boats := IfFileValid('Player1');
+  field2_with_boats :=  IfFileValid('Player2');
+//  ClearScreen;
 
   if (ships_valid(field1_with_boats) and ships_valid(field2_with_boats)) then
 
